@@ -1,0 +1,105 @@
+#!/bin/csh -f
+
+#-- seismic model for the lower mantle to be used
+#-- it will be placed in between the
+#-- (fixed) core and upper mantle models
+
+
+#-- MODELS AND SUPPORTING CODES ARE IN ETC/
+set model = $1
+#-- record length (sec)
+set T     = $2
+set imax  = $3
+
+#-- number of samples
+set n = `calc int $T`
+
+set in_psv  = input.$model.psv
+set in_sh   = input.$model.sh
+
+./mk_header $T $n $imax > $in_psv
+./mk_header $T $n $imax > $in_sh
+
+#-- core (fixed)
+set crmodel = etc/core
+#-- number of layers describing the core
+set n0 = 2
+#-- lower mantle
+./mkvel models/$model lm.psv lm.sh
+#-- number of layers describing the lower mantle
+set n1 = `grep 312.0 lm.psv | wc -l`
+#-- upper mantle (fixed
+set ummodel = etc/uppermantle
+#-- number of layers describing the upper mantle
+set n2 = 8
+
+echo "c parameter for the structure" >> $in_psv
+echo "c parameter for the structure" >> $in_sh
+#-- number of layers
+set nlay = `calc $n1   + $n2`
+set nlay = `calc int $nlay`
+echo "   $nlay   nzone"              >> $in_sh
+#-- add number of core layers for psv
+set nlay = `calc $nlay + $n0`
+set nlay = `calc int $nlay`
+echo "   $nlay   nzone"              >> $in_psv
+
+#-- source parameters
+set cmt  = 100402E
+set evla = `hvdpde $cmt | colgrep -c 10`
+set evlo = `hvdpde $cmt | colgrep -c 12`
+set evdp = `hvdpde $cmt | colgrep -c 14`
+set rads = `calc 6371. - $evdp`
+set rads = `calc 6f1 $rads`
+
+#-- core
+cat $crmodel                         >> $in_psv
+#-- lower mantle
+cat lm.psv                           >> $in_psv
+cat lm.sh                            >> $in_sh
+#-- upper mantle
+cat $ummodel.psv                     >> $in_psv
+cat $ummodel.sh                      >> $in_sh
+
+#-- source location
+echo "c"                             >> $in_psv
+echo "c"                             >> $in_sh
+#-- location
+echo "c parameter for the source"    >> $in_psv
+echo "c parameter for the source"    >> $in_sh
+echo "   $rads   $evla $evlo"        >> $in_psv
+echo "   $rads   $evla $evlo"        >> $in_sh
+
+#-- #-- moment tensor
+#-- hvddsm $cmt                          >> $in_psv
+#-- hvddsm $cmt                          >> $in_sh
+#-- strike/dip/rake
+set str = 194
+set dip = 23
+set rake = -129
+dc2cmt $str $dip $rake                   >> $in_psv
+dc2cmt $str $dip $rake                   >> $in_sh
+
+#--station info
+echo "c parameter for the station"   >> $in_psv
+echo "c parameter for the station"   >> $in_sh
+echo "   3   nr"                     >> $in_psv
+echo "   3   nr"                     >> $in_sh
+echo "      34.1000 -118.2000"       >> $in_psv
+echo "      34.1000 -118.2000"       >> $in_sh
+echo "      38.1000  -91.2000"       >> $in_psv
+echo "      38.1000  -91.2000"       >> $in_sh
+echo "      42.5000  -71.7000"       >> $in_psv
+echo "      42.5000  -71.7000"       >> $in_sh
+echo "c output files"                >> $in_psv
+echo "c output files"                >> $in_sh
+echo "./PASpsv.spc"                  >> $in_psv
+echo "./PASsh.spc"                   >> $in_sh
+echo "./CCMpsv.spc"                  >> $in_psv
+echo "./CCMsh.spc"                   >> $in_sh
+echo "./HRVpsv.spc"                  >> $in_psv
+echo "./HRVsh.spc"                   >> $in_sh
+echo "c"                             >> $in_psv
+echo "c"                             >> $in_sh
+echo "end"                           >> $in_psv
+echo "end"                           >> $in_sh

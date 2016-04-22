@@ -1,0 +1,46 @@
+ ----------------------------------------------------------------------
+<< spcsac, Release 1.0.0 >>
+                                              FUJI Nobuaki, 2006.3
+                                              FUJI Nobuaki, 2009.4
+-----------------------------------------------------------------------
+USAGE:  spcsac [option]
+-v:            If you are so lucky, you can see the version
+               of this software :-) otherwise...: quotes and unquotes...
+-a:            ASCII output for non-SAC-users.
+-h:            If you want to call help file (this text).
+-e:            If you want to work in a prompt mode rather than
+               in a commandline mode.
+-l LSMOOTH:    Smoothness parameter LSMOOTH has to be determined.
+               If you want to know appropriate lsmooth for your
+               expected sampling frequency,
+               you can calculate with this spcsac software:
+               %spcsac -t
+-i:            In order to obtain appropriate lsmooth, spcsac will
+               help you to calculate the value.
+-H SAMPLINGHZ: If you put Sampling Hz value, spcsac will automatically
+               calculate the appropriate LSMOOTH value.
+-d DIRECTORY:  All spc files in DIRECTORY will be transformed.
+               default: (./)
+-f FILE:       One specified spc FILE only will be transformed.
+-p/-s STRINGS: In order to discriminate PSV or SH spc files,
+               you have to put common strings back in the file names.
+               (default: psv.spc and sh.spc
+-c RTZ:        You can choose which component to be transformed.
+               (R/T/Z)               (default: RTZ)
+-m MODE:       You can choose PSV/SH channel. (SH/PSV, sh/psv) (default: PSVSH)
+-r/-t/-z STR:  In order to discriminate radial/transverse/vertical
+               component output sac files, you have to put common
+               strings back in the file names. (default: .Rs/.Ts/.Zs)
+
+If you do not put any options, you are to transform all set of
+ PSV and SH scp files named "xxxxxxpsv.spc" and "xxxxxxsh.spc"
+ in current working directory. LSMOOTH is set as 4.
+In addition to that, you will obtain complete seismograms
+named "xxxxxx.Rs" something.
+
+EXAMPLES:
+	spcsac -l 8 -mPSV -ppsv.spc_tmp -cZT -t .transverse.sac
+
+You can also check README.pdf in the spcsac directory.
+If you find some bugs, please report them to me: fuji@eps.s.u-tokyo.ac.jp
+Thank you for you cooperation.

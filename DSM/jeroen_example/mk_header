@@ -1,0 +1,33 @@
+#!/bin/csh -f
+
+#-- make the header of the dsm input
+
+#------------------------------------
+#-- some parameters I wouldn't modify
+set re   = 1.d-2
+set ratc = 1.d-10
+set ratl = 1.d-5
+set wrap = 1.d-2
+#------------------------------------
+
+
+set T    = $1
+set n    = $2
+set imin = 0
+set imax = $3
+
+#-- generates a DSM (tish) input file
+echo "c"
+echo "c parameter for the periodic range"
+echo "   $T   $n   tlen(s),np"
+echo "c relative error (See GT95 eq. 6.2)"
+echo "   $re re"
+echo "c ampratio using in grid cut-off (1.d-10 is recommended)"
+echo "   $ratc  ratc"
+echo "c ampratio using in l-cutoff"
+echo "   $ratl   ratl"
+echo "c wrap-around attenuation for omegai"
+echo "   $wrap"
+echo "c parameter for the trial function"
+echo "c imin imax"
+echo "   $imin   $imax"

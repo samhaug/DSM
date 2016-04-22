@@ -1,0 +1,43 @@
+#!/bin/csh -f
+
+set model = prem
+set model = m1
+set model = m2
+set model = ulvz
+set T     = 3000
+set imax  = 1000
+
+set run_dsm = 1
+set cleanup = 1
+
+#-- the tish binary
+set binsh  = $SRCC/DSM/tish-1.9.0
+#-- the tipsv binary
+set binpsv = $SRCC/DSM/tipsv-1.8.0
+#-- the spc2sac binary
+set binspc = $SRCC/DSM/spcsac-v1.0.0
+
+if ( $run_dsm ) then
+  ./mkinput $model $T $imax
+  echo "Running tish ..."
+  $binsh/tish   < input.$model.sh
+  echo "Running tipsv ..."
+  $binpsv/tipsv < input.$model.psv
+endif
+
+#-- making sac
+$binspc/spcsac
+mv CCM.Zs ccm.$model.z; mv CCM.Rs ccm.$model.r; mv CCM.Ts ccm.$model.t
+mv PAS.Zs pas.$model.z; mv PAS.Rs pas.$model.r; mv PAS.Ts pas.$model.t
+mv HRV.Zs hrv.$model.z; mv HRV.Rs hrv.$model.r; mv HRV.Ts hrv.$model.t
+sac<<endsac
+r *.$model.z *.$model.r *.$model.t
+rmean; rtr
+taper; int; rtr
+w over
+quit
+endsac
+
+if ( $cleanup ) then
+  rm input.$model.* work
+endif
